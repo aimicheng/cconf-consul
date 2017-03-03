@@ -2,12 +2,12 @@ var cconf = require('../index');
 
 cconf({
     consul: {
-        host: "127.0.0.1",
+        host: "10.16.3.240",
         port: 8500,
         secure: false
     },
-    root_key: 'common/'
-}, function(err, result) {
+    rootKey: 'plf/dev/common/'
+}, function(err, cconf) {
     if (err) throw err;
-    console.log(result);
+    console.log(cconf.get('redis'));
 });

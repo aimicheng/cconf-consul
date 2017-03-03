@@ -4,13 +4,29 @@ const consul = require('consul');
 var conf = {}, _inited = false, EF = function() {};
 
 module.exports = function(options, callback) {
-    var root_key = options.rootkey;
-    var onError = options.onError ? options.onError : EF;
-    var consul_client = consul(options.consul);
-    var watch = consul_client.watch({
+    var rootKey = options.rootKey,
+        onError = options.onError ? options.onError : EF,
+        consul_client,
+        watcher;
+
+    if (!rootKey) {
+        throw new Error('rootKey must presents.');
+    }
+    if (rootKey.startsWith('/')) {
+        throw new Error("rootKey can not start with '/'.");
+    }
+    if (!rootKey.endsWith('/')) {
+        throw new Error("rootKey must end with '/'.");
+    }
+    if (typeof onError !== 'function') {
+        throw new Error('onError must be a function.');
+    }
+
+    consul_client = consul(options.consul);
+    watcher = consul_client.watch({
         method: consul_client.kv.get,
         options: {
-            key: root_key,
+            key: rootKey,
             recurse: true
         }
     });
@@ -18,7 +34,7 @@ module.exports = function(options, callback) {
     function process(results) {
         for (var i in results) {
             var item = results[i],
-                name = item.Key.replace(root_key, ''),
+                name = item.Key.replace(rootKey, ''),
                 value = item.Value;
             if (name === '') {
                 continue;
@@ -48,13 +64,13 @@ module.exports = function(options, callback) {
         cconf.merge(conf);
         if (!_inited) {
             _inited = true;
-            callback(null, conf);
+            callback(null, cconf);
         }
     }
 
-    watch.on('change', function(data, res) {
+    watcher.on('change', function(data, res) {
         process(data);
     });
 
-    watch.on('error', onError);
+    watcher.on('error', onError);
 };

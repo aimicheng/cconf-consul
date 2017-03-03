@@ -1,6 +1,6 @@
 {
   "name": "cconf-consul",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Cascading configuration object with consul support.",
   "main": "index.js",
   "scripts": {},
