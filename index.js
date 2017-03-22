@@ -1,9 +1,11 @@
 const cconf = require('cconf');
 const consul = require('consul');
 
-var conf = {}, _inited = false, EF = function() {};
+var conf = {},
+    _inited = false,
+    EF = function() {};
 
-module.exports = function(options, callback) {
+function init(options, callback) {
     var rootKey = options.rootKey,
         onError = options.onError ? options.onError : EF,
         consul_client,
@@ -74,3 +76,5 @@ module.exports = function(options, callback) {
 
     watcher.on('error', onError);
 };
+
+module.exports = init;
